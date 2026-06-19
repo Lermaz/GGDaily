@@ -1,3 +1,5 @@
+import '@/lib/i18n';
+
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -6,6 +8,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
+import { LocaleProvider, useLocale } from '@/contexts/locale-context';
 import { theme } from '@/lib/theme';
 
 export { ErrorBoundary } from 'expo-router';
@@ -13,7 +16,9 @@ export { ErrorBoundary } from 'expo-router';
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
-  const { isLoading } = useAuth();
+  const { isLoading: isAuthLoading } = useAuth();
+  const { isReady: isLocaleReady } = useLocale();
+  const isLoading = isAuthLoading || !isLocaleReady;
 
   useEffect(() => {
     if (!isLoading) {
@@ -41,9 +46,11 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <RootNavigator />
-      </AuthProvider>
+      <LocaleProvider>
+        <AuthProvider>
+          <RootNavigator />
+        </AuthProvider>
+      </LocaleProvider>
     </SafeAreaProvider>
   );
 }

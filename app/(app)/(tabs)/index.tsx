@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LanguagePicker } from '@/components/settings/language-picker';
 import { AuthButton } from '@/components/auth/auth-button';
 import { EmptyState } from '@/components/finance/empty-state';
 import { ScreenHeader } from '@/components/finance/screen-header';
@@ -34,6 +35,7 @@ export default function DashboardScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScreenHeader title="Dashboard" rightAction={{ label: 'Sign out', onPress: handleSignOut }} />
       <ScrollView contentContainerStyle={styles.content}>
+        <LanguagePicker />
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <View style={styles.balanceCard}>

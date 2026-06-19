@@ -1,14 +1,17 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { AuthButton } from '@/components/auth/auth-button';
 import { AuthInput, PasswordInput, TextLink } from '@/components/auth/auth-input';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { ErrorBanner, SuccessBanner } from '@/components/auth/error-banner';
 import { useAuth } from '@/contexts/auth-context';
-import { registerSchema } from '@/lib/validation';
+import { useAppTranslation } from '@/hooks/use-translation';
+import { getRegisterSchema } from '@/lib/validation-i18n';
 
 export default function RegisterScreen() {
+  const { t } = useAppTranslation();
+  const registerSchema = useMemo(() => getRegisterSchema(t), [t]);
   const { signUp } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,21 +52,19 @@ export default function RegisterScreen() {
       return;
     }
 
-    setSuccess('Account created. Check your email to confirm, then log in.');
+    setSuccess(t('auth.registerSuccess'));
   }
 
   return (
     <AuthScreen
-      title="Create account"
-      subtitle="Sign up with your email to start using GGDaily."
-      footer={
-        <TextLink label="Already have an account? Log in" onPress={() => router.push('/login')} />
-      }
+      title={t('auth.registerTitle')}
+      subtitle={t('auth.registerSubtitle')}
+      footer={<TextLink label={t('auth.hasAccount')} onPress={() => router.push('/login')} />}
     >
       <ErrorBanner message={error} />
       <SuccessBanner message={success} />
       <AuthInput
-        label="Email"
+        label={t('auth.email')}
         value={email}
         onChangeText={setEmail}
         error={fieldErrors.email}
@@ -74,20 +75,20 @@ export default function RegisterScreen() {
         editable={!isLoading}
       />
       <PasswordInput
-        label="Password"
+        label={t('auth.password')}
         value={password}
         onChangeText={setPassword}
         error={fieldErrors.password}
         editable={!isLoading}
       />
       <PasswordInput
-        label="Confirm password"
+        label={t('auth.confirmPassword')}
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         error={fieldErrors.confirmPassword}
         editable={!isLoading}
       />
-      <AuthButton label="Create account" onPress={handleSubmit} isLoading={isLoading} />
+      <AuthButton label={t('auth.createAccount')} onPress={handleSubmit} isLoading={isLoading} />
     </AuthScreen>
   );
 }

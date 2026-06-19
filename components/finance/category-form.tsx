@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -11,9 +11,10 @@ import {
 import { AuthButton } from '@/components/auth/auth-button';
 import { AuthInput } from '@/components/auth/auth-input';
 import { ErrorBanner } from '@/components/auth/error-banner';
+import { AmountInput } from '@/components/finance/amount-input';
 import { ColorPicker } from '@/components/finance/color-picker';
-import { CATEGORY_COLORS } from '@/lib/finance/types';
-import { categoryFormSchema } from '@/lib/finance/validation';
+import { useAppTranslation } from '@/hooks/use-translation';
+import { getCategoryFormSchema } from '@/lib/validation-i18n';
 import { theme } from '@/lib/theme';
 import type { CategoryKind } from '@/types/database';
 
@@ -22,12 +23,16 @@ interface CategoryFormProps {
     name: string;
     kind: CategoryKind;
     color: string;
+    monthlyLimit?: string;
   };
   submitLabel: string;
   kindLocked?: boolean;
-  onSubmit: (values: { name: string; kind: CategoryKind; color: string }) => Promise<{
-    error: string | null;
-  }>;
+  onSubmit: (values: {
+    name: string;
+    kind: CategoryKind;
+    color: string;
+    monthlyLimit?: number | null;
+  }) => Promise<{ error: string | null }>;
   onDelete?: () => Promise<{ error: string | null }>;
 }
 
@@ -38,16 +43,24 @@ export function CategoryForm({
   onSubmit,
   onDelete,
 }: CategoryFormProps) {
+  const { t } = useAppTranslation();
+  const categoryFormSchema = useMemo(() => getCategoryFormSchema(t), [t]);
   const [name, setName] = useState(initialValues.name);
   const [kind] = useState(initialValues.kind);
   const [color, setColor] = useState(initialValues.color);
+  const [monthlyLimit, setMonthlyLimit] = useState(initialValues.monthlyLimit ?? '');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit() {
     setError('');
-    const result = categoryFormSchema.safeParse({ name, kind, color });
+    const result = categoryFormSchema.safeParse({
+      name,
+      kind,
+      color,
+      monthlyLimit: monthlyLimit.trim() || undefined,
+    });
 
     if (!result.success) {
       const errors: Record<string, string> = {};
@@ -63,7 +76,16 @@ export function CategoryForm({
 
     setFieldErrors({});
     setIsLoading(true);
-    const { error: submitError } = await onSubmit(result.data);
+    const parsedLimit =
+      kind === 'expense' && result.data.monthlyLimit
+        ? Number(result.data.monthlyLimit)
+        : null;
+    const { error: submitError } = await onSubmit({
+      name: result.data.name,
+      kind: result.data.kind,
+      color: result.data.color,
+      monthlyLimit: parsedLimit,
+    });
     setIsLoading(false);
 
     if (submitError) {
@@ -79,7 +101,7 @@ export function CategoryForm({
     const { error: deleteError } = await onDelete();
     setIsLoading(false);
     if (deleteError) {
-      setError(deleteError);
+      setError(deleteError === 'category_in_use' ? t('categories.deleteBlocked') : deleteError);
     }
   }
 
@@ -92,7 +114,7 @@ export function CategoryForm({
         <ErrorBanner message={error} />
 
         <AuthInput
-          label="Name"
+          label={t('categories.name')}
           value={name}
           onChangeText={setName}
           error={fieldErrors.name}
@@ -100,12 +122,24 @@ export function CategoryForm({
         />
 
         <View style={styles.kindField}>
-          <Text style={styles.label}>Type</Text>
-          <Text style={styles.kindValue}>{kind}</Text>
-          {kindLocked ? (
-            <Text style={styles.hint}>Category type cannot be changed after creation.</Text>
-          ) : null}
+          <Text style={styles.label}>{t('categories.type')}</Text>
+          <Text style={styles.kindValue}>{t(`transactions.${kind}`)}</Text>
+          {kindLocked ? <Text style={styles.hint}>{t('categories.typeLocked')}</Text> : null}
         </View>
+
+        {kind === 'expense' ? (
+          <AmountInput
+            label={t('categories.monthlyLimit')}
+            value={monthlyLimit}
+            onChangeText={setMonthlyLimit}
+            error={fieldErrors.monthlyLimit}
+            editable={!isLoading}
+            placeholder="0.00"
+          />
+        ) : null}
+        {kind === 'expense' ? (
+          <Text style={styles.hint}>{t('categories.monthlyLimitHint')}</Text>
+        ) : null}
 
         <ColorPicker selectedColor={color} onSelect={setColor} />
 
@@ -113,7 +147,7 @@ export function CategoryForm({
 
         {onDelete ? (
           <AuthButton
-            label="Delete category"
+            label={t('categories.delete')}
             variant="secondary"
             onPress={handleDelete}
             disabled={isLoading}

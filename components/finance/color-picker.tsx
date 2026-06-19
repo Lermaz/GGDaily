@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useAppTranslation } from '@/hooks/use-translation';
 import { CATEGORY_COLORS } from '@/lib/finance/types';
 import { theme } from '@/lib/theme';
 
@@ -9,9 +10,10 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker({ selectedColor, onSelect }: ColorPickerProps) {
+  const { t } = useAppTranslation();
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Color</Text>
+      <Text style={styles.label}>{t('categories.color')}</Text>
       <View style={styles.grid}>
         {CATEGORY_COLORS.map((color) => {
           const isSelected = color === selectedColor;

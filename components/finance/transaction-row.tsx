@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useAppTranslation } from '@/hooks/use-translation';
 import { formatDisplayDate, formatSignedAmount } from '@/lib/finance/types';
 import { theme } from '@/lib/theme';
 import type { CategoryKind, TransactionWithCategory } from '@/types/database';
@@ -10,6 +11,7 @@ interface TransactionRowProps {
 }
 
 export function TransactionRow({ transaction, onPress }: TransactionRowProps) {
+  const { t } = useAppTranslation();
   const kind = (transaction.category?.kind ?? 'expense') as CategoryKind;
   const amountColor = kind === 'income' ? theme.colors.income : theme.colors.expense;
 
@@ -26,7 +28,7 @@ export function TransactionRow({ transaction, onPress }: TransactionRowProps) {
             style={[styles.dot, { backgroundColor: transaction.category?.color ?? theme.colors.border }]}
           />
           <Text style={styles.description} numberOfLines={1}>
-            {transaction.description || transaction.category?.name || 'Transaction'}
+            {transaction.description || transaction.category?.name || t('transactions.untitled')}
           </Text>
         </View>
         <Text style={styles.meta}>

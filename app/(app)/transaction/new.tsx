@@ -4,10 +4,12 @@ import { useMemo } from 'react';
 import { TransactionForm } from '@/components/finance/transaction-form';
 import { useCategories } from '@/hooks/use-categories';
 import { useTransactions } from '@/hooks/use-transactions';
+import { useAppTranslation } from '@/hooks/use-translation';
 import { toDateString } from '@/lib/finance/types';
 import type { CategoryKind } from '@/types/database';
 
 export default function NewTransactionScreen() {
+  const { t } = useAppTranslation();
   const { categories } = useCategories();
   const { createTransaction } = useTransactions();
 
@@ -18,9 +20,9 @@ export default function NewTransactionScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Add transaction' }} />
+      <Stack.Screen options={{ title: t('transactions.add') }} />
       <TransactionForm
-        submitLabel="Save transaction"
+        submitLabel={t('transactions.save')}
         initialValues={{
           amount: '',
           description: '',

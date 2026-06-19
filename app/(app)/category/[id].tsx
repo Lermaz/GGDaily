@@ -3,10 +3,12 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { CategoryForm } from '@/components/finance/category-form';
 import { useCategories } from '@/hooks/use-categories';
+import { useAppTranslation } from '@/hooks/use-translation';
 import { theme } from '@/lib/theme';
 import type { CategoryKind } from '@/types/database';
 
 export default function EditCategoryScreen() {
+  const { t } = useAppTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { categories, updateCategory, deleteCategory, isLoading } = useCategories();
   const category = categories.find((item) => item.id === id);
@@ -25,19 +27,21 @@ export default function EditCategoryScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Edit category' }} />
+      <Stack.Screen options={{ title: t('categories.edit') }} />
       <CategoryForm
-        submitLabel="Update category"
+        submitLabel={t('categories.update')}
         kindLocked
         initialValues={{
           name: category.name,
           kind: category.kind as CategoryKind,
           color: category.color,
+          monthlyLimit: category.monthly_limit ? String(category.monthly_limit) : '',
         }}
         onSubmit={async (values) => {
           const result = await updateCategory(id, {
             name: values.name,
             color: values.color,
+            monthlyLimit: values.monthlyLimit,
           });
           if (!result.error) {
             router.back();

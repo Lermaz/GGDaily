@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '@/contexts/auth-context';
+import i18n from '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
 import type { Category, CategoryKind } from '@/types/database';
 
@@ -46,10 +47,11 @@ interface UseCategoriesResult {
     name: string;
     kind: CategoryKind;
     color: string;
+    monthlyLimit?: number | null;
   }) => Promise<{ error: string | null }>;
   updateCategory: (
     id: string,
-    input: { name: string; color: string },
+    input: { name: string; color: string; monthlyLimit?: number | null },
   ) => Promise<{ error: string | null }>;
   deleteCategory: (id: string) => Promise<{ error: string | null }>;
 }
@@ -91,9 +93,14 @@ export function useCategories(): UseCategoriesResult {
   }, [refetch]);
 
   const createCategory = useCallback(
-    async (input: { name: string; kind: CategoryKind; color: string }) => {
+    async (input: {
+      name: string;
+      kind: CategoryKind;
+      color: string;
+      monthlyLimit?: number | null;
+    }) => {
       if (!session?.user.id) {
-        return { error: 'Not authenticated' };
+        return { error: i18n.t('common.notAuthenticated') };
       }
 
       const { error: insertError } = await supabase.from('categories').insert({
@@ -101,6 +108,7 @@ export function useCategories(): UseCategoriesResult {
         name: input.name.trim(),
         kind: input.kind,
         color: input.color,
+        monthly_limit: input.kind === 'expense' ? (input.monthlyLimit ?? null) : null,
       });
 
       if (insertError) {
@@ -114,10 +122,14 @@ export function useCategories(): UseCategoriesResult {
   );
 
   const updateCategory = useCallback(
-    async (id: string, input: { name: string; color: string }) => {
+    async (id: string, input: { name: string; color: string; monthlyLimit?: number | null }) => {
       const { error: updateError } = await supabase
         .from('categories')
-        .update({ name: input.name.trim(), color: input.color })
+        .update({
+          name: input.name.trim(),
+          color: input.color,
+          monthly_limit: input.monthlyLimit ?? null,
+        })
         .eq('id', id);
 
       if (updateError) {
@@ -136,7 +148,7 @@ export function useCategories(): UseCategoriesResult {
 
       if (deleteError) {
         if (deleteError.code === '23503') {
-          return { error: 'Cannot delete a category that has transactions.' };
+          return { error: 'category_in_use' };
         }
         return { error: deleteError.message };
       }

@@ -1,14 +1,17 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { AuthButton } from '@/components/auth/auth-button';
 import { AuthInput, TextLink } from '@/components/auth/auth-input';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { ErrorBanner, SuccessBanner } from '@/components/auth/error-banner';
 import { useAuth } from '@/contexts/auth-context';
-import { forgotPasswordSchema } from '@/lib/validation';
+import { useAppTranslation } from '@/hooks/use-translation';
+import { getForgotPasswordSchema } from '@/lib/validation-i18n';
 
 export default function ForgotPasswordScreen() {
+  const { t } = useAppTranslation();
+  const forgotPasswordSchema = useMemo(() => getForgotPasswordSchema(t), [t]);
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -43,19 +46,19 @@ export default function ForgotPasswordScreen() {
       return;
     }
 
-    setSuccess('If an account exists for that email, a reset link has been sent.');
+    setSuccess(t('auth.resetSuccess'));
   }
 
   return (
     <AuthScreen
-      title="Reset password"
-      subtitle="Enter your email and we'll send you a link to reset your password."
-      footer={<TextLink label="Back to log in" onPress={() => router.push('/login')} />}
+      title={t('auth.forgotPasswordTitle')}
+      subtitle={t('auth.forgotPasswordSubtitle')}
+      footer={<TextLink label={t('auth.backToLogin')} onPress={() => router.push('/login')} />}
     >
       <ErrorBanner message={error} />
       <SuccessBanner message={success} />
       <AuthInput
-        label="Email"
+        label={t('auth.email')}
         value={email}
         onChangeText={setEmail}
         error={fieldErrors.email}
@@ -65,7 +68,7 @@ export default function ForgotPasswordScreen() {
         textContentType="emailAddress"
         editable={!isLoading}
       />
-      <AuthButton label="Send reset link" onPress={handleSubmit} isLoading={isLoading} />
+      <AuthButton label={t('auth.sendResetLink')} onPress={handleSubmit} isLoading={isLoading} />
     </AuthScreen>
   );
 }

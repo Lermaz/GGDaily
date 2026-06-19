@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '@/contexts/auth-context';
+import type { TransactionFilters } from '@/lib/finance/filters';
+import i18n from '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
 import type { TransactionWithCategory } from '@/types/database';
 
@@ -38,7 +40,7 @@ const TRANSACTION_SELECT = `
   )
 `;
 
-export function useTransactions(): UseTransactionsResult {
+export function useTransactions(filters?: TransactionFilters): UseTransactionsResult {
   const { session } = useAuth();
   const [transactions, setTransactions] = useState<TransactionWithCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,10 +54,31 @@ export function useTransactions(): UseTransactionsResult {
     }
 
     setIsLoading(true);
-    const { data, error: fetchError } = await supabase
+    let query = supabase
       .from('transactions')
       .select(TRANSACTION_SELECT)
-      .eq('user_id', session.user.id)
+      .eq('user_id', session.user.id);
+
+    if (filters?.search?.trim()) {
+      query = query.ilike('description', `%${filters.search.trim()}%`);
+    }
+    if (filters?.categoryId) {
+      query = query.eq('category_id', filters.categoryId);
+    }
+    if (filters?.startDate) {
+      query = query.gte('occurred_on', filters.startDate);
+    }
+    if (filters?.endDate) {
+      query = query.lte('occurred_on', filters.endDate);
+    }
+    if (filters?.minAmount != null) {
+      query = query.gte('amount', filters.minAmount);
+    }
+    if (filters?.maxAmount != null) {
+      query = query.lte('amount', filters.maxAmount);
+    }
+
+    const { data, error: fetchError } = await query
       .order('occurred_on', { ascending: false })
       .order('created_at', { ascending: false });
 
@@ -67,7 +90,15 @@ export function useTransactions(): UseTransactionsResult {
       setTransactions((data as TransactionWithCategory[]) ?? []);
     }
     setIsLoading(false);
-  }, [session?.user.id]);
+  }, [
+    session?.user.id,
+    filters?.search,
+    filters?.categoryId,
+    filters?.startDate,
+    filters?.endDate,
+    filters?.minAmount,
+    filters?.maxAmount,
+  ]);
 
   useEffect(() => {
     refetch();
@@ -81,7 +112,7 @@ export function useTransactions(): UseTransactionsResult {
       occurredOn: string;
     }) => {
       if (!session?.user.id) {
-        return { error: 'Not authenticated' };
+        return { error: i18n.t('common.notAuthenticated') };
       }
 
       const { error: insertError } = await supabase.from('transactions').insert({

@@ -3,10 +3,12 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { TransactionForm } from '@/components/finance/transaction-form';
 import { useTransactions } from '@/hooks/use-transactions';
+import { useAppTranslation } from '@/hooks/use-translation';
 import { theme } from '@/lib/theme';
 import type { CategoryKind } from '@/types/database';
 
 export default function EditTransactionScreen() {
+  const { t } = useAppTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getTransaction, updateTransaction, deleteTransaction, isLoading } = useTransactions();
   const transaction = getTransaction(id);
@@ -25,9 +27,9 @@ export default function EditTransactionScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Edit transaction' }} />
+      <Stack.Screen options={{ title: t('transactions.edit') }} />
       <TransactionForm
-        submitLabel="Update transaction"
+        submitLabel={t('transactions.update')}
         initialValues={{
           amount: String(transaction.amount),
           description: transaction.description,

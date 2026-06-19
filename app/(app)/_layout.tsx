@@ -20,8 +20,24 @@ export default function AppLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="logged" />
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.colors.background } }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen
+        name="transaction/new"
+        options={{ presentation: 'modal', headerShown: true, title: 'Add transaction' }}
+      />
+      <Stack.Screen
+        name="transaction/[id]"
+        options={{ presentation: 'modal', headerShown: true, title: 'Edit transaction' }}
+      />
+      <Stack.Screen
+        name="category/new"
+        options={{ presentation: 'modal', headerShown: true, title: 'Add category' }}
+      />
+      <Stack.Screen
+        name="category/[id]"
+        options={{ presentation: 'modal', headerShown: true, title: 'Edit category' }}
+      />
     </Stack>
   );
 }

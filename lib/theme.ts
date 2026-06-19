@@ -11,6 +11,8 @@ export const theme = {
     errorBackground: '#FEF2F2',
     success: '#16A34A',
     successBackground: '#F0FDF4',
+    income: '#16A34A',
+    expense: '#DC2626',
     white: '#FFFFFF',
   },
   spacing: {

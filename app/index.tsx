@@ -10,7 +10,7 @@ export default function HomeScreen() {
   const { session, isLoading } = useAuth();
 
   if (!isLoading && session) {
-    return <Redirect href="/logged" />;
+    return <Redirect href="/(app)/(tabs)" />;
   }
 
   return (
@@ -21,7 +21,7 @@ export default function HomeScreen() {
             GGDaily
           </Text>
           <Text style={styles.subtitle}>
-            Your daily companion. Sign in or create an account to get started.
+            Track your income, expenses, and balance in one place.
           </Text>
         </View>
 

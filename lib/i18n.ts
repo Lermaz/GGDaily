@@ -8,6 +8,8 @@ import es from '@/locales/es.json';
 export const SUPPORTED_LANGUAGES = ['en', 'es'] as const;
 export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
+export const DEFAULT_LANGUAGE: AppLanguage = 'es';
+
 const LOCALE_STORAGE_KEY = 'app_language';
 
 export function getDeviceLanguage(): AppLanguage {
@@ -26,8 +28,8 @@ void i18n.use(initReactI18next).init({
     en: { translation: en },
     es: { translation: es },
   },
-  lng: getDeviceLanguage(),
-  fallbackLng: 'en',
+  lng: DEFAULT_LANGUAGE,
+  fallbackLng: DEFAULT_LANGUAGE,
   interpolation: {
     escapeValue: false,
   },

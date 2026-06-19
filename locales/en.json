@@ -15,6 +15,13 @@
     "english": "English",
     "spanish": "Spanish"
   },
+  "settings": {
+    "title": "Settings",
+    "supportTitle": "Support the app",
+    "donation": "Buy me a coffee",
+    "donationDescription": "Your support helps maintain and improve GGDaily.",
+    "openSettings": "Open settings"
+  },
   "tabs": {
     "dashboard": "Dashboard",
     "transactions": "Transactions",

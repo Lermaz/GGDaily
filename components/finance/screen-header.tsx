@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { theme } from '@/lib/theme';
@@ -8,15 +9,28 @@ interface ScreenHeaderProps {
     label: string;
     onPress: () => void;
   };
+  rightIconAction?: {
+    accessibilityLabel: string;
+    onPress: () => void;
+  };
 }
 
-export function ScreenHeader({ title, rightAction }: ScreenHeaderProps) {
+export function ScreenHeader({ title, rightAction, rightIconAction }: ScreenHeaderProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.title} accessibilityRole="header">
         {title}
       </Text>
-      {rightAction ? (
+      {rightIconAction ? (
+        <Pressable
+          onPress={rightIconAction.onPress}
+          accessibilityRole="button"
+          accessibilityLabel={rightIconAction.accessibilityLabel}
+          style={({ pressed }) => [styles.iconAction, pressed && styles.pressed]}
+        >
+          <Ionicons name="settings-outline" size={24} color={theme.colors.primary} />
+        </Pressable>
+      ) : rightAction ? (
         <Pressable
           onPress={rightAction.onPress}
           accessibilityRole="button"
@@ -48,6 +62,12 @@ const styles = StyleSheet.create({
     minHeight: theme.touchTarget,
     justifyContent: 'center',
     paddingHorizontal: theme.spacing.sm,
+  },
+  iconAction: {
+    minWidth: theme.touchTarget,
+    minHeight: theme.touchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pressed: {
     opacity: 0.7,

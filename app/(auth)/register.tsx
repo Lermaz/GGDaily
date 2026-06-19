@@ -1,0 +1,93 @@
+import { router } from 'expo-router';
+import { useState } from 'react';
+
+import { AuthButton } from '@/components/auth/auth-button';
+import { AuthInput, PasswordInput, TextLink } from '@/components/auth/auth-input';
+import { AuthScreen } from '@/components/auth/auth-screen';
+import { ErrorBanner, SuccessBanner } from '@/components/auth/error-banner';
+import { useAuth } from '@/contexts/auth-context';
+import { registerSchema } from '@/lib/validation';
+
+export default function RegisterScreen() {
+  const { signUp } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleSubmit() {
+    setError('');
+    setSuccess('');
+    const result = registerSchema.safeParse({
+      email: email.trim(),
+      password,
+      confirmPassword,
+    });
+
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0];
+        if (typeof field === 'string' && !errors[field]) {
+          errors[field] = issue.message;
+        }
+      }
+      setFieldErrors(errors);
+      return;
+    }
+
+    setFieldErrors({});
+    setIsLoading(true);
+    const { error: signUpError } = await signUp(result.data.email, result.data.password);
+    setIsLoading(false);
+
+    if (signUpError) {
+      setError(signUpError);
+      return;
+    }
+
+    setSuccess('Account created. Check your email to confirm, then log in.');
+  }
+
+  return (
+    <AuthScreen
+      title="Create account"
+      subtitle="Sign up with your email to start using GGDaily."
+      footer={
+        <TextLink label="Already have an account? Log in" onPress={() => router.push('/login')} />
+      }
+    >
+      <ErrorBanner message={error} />
+      <SuccessBanner message={success} />
+      <AuthInput
+        label="Email"
+        value={email}
+        onChangeText={setEmail}
+        error={fieldErrors.email}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+        textContentType="emailAddress"
+        editable={!isLoading}
+      />
+      <PasswordInput
+        label="Password"
+        value={password}
+        onChangeText={setPassword}
+        error={fieldErrors.password}
+        editable={!isLoading}
+      />
+      <PasswordInput
+        label="Confirm password"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        error={fieldErrors.confirmPassword}
+        editable={!isLoading}
+      />
+      <AuthButton label="Create account" onPress={handleSubmit} isLoading={isLoading} />
+    </AuthScreen>
+  );
+}

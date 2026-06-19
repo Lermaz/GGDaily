@@ -19,6 +19,7 @@ export default function NewCategoryScreen() {
           name: '',
           kind: categoryKind,
           color: CATEGORY_COLORS[0],
+          monthlyLimit: '',
         }}
         onSubmit={async (values) => {
           const result = await createCategory(values);

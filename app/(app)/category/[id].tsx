@@ -33,11 +33,13 @@ export default function EditCategoryScreen() {
           name: category.name,
           kind: category.kind as CategoryKind,
           color: category.color,
+          monthlyLimit: category.monthly_limit ? String(category.monthly_limit) : '',
         }}
         onSubmit={async (values) => {
           const result = await updateCategory(id, {
             name: values.name,
             color: values.color,
+            monthlyLimit: values.monthlyLimit,
           });
           if (!result.error) {
             router.back();

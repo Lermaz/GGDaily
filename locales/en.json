@@ -15,6 +15,23 @@
     "english": "English",
     "spanish": "Spanish"
   },
+  "onboarding": {
+    "languageTitle": "Choose your language",
+    "languageSubtitle": "Default categories will be created in the language you select.",
+    "continue": "Continue"
+  },
+  "defaultCategories": {
+    "salary": "Salary",
+    "freelance": "Freelance",
+    "otherIncome": "Other Income",
+    "food": "Food",
+    "rent": "Rent",
+    "transport": "Transport",
+    "bills": "Bills",
+    "shopping": "Shopping",
+    "entertainment": "Entertainment",
+    "other": "Other"
+  },
   "settings": {
     "title": "Settings",
     "supportTitle": "Support the app",

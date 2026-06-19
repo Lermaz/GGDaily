@@ -1,16 +1,30 @@
-import { Redirect, Stack } from 'expo-router';
-import { useMemo } from 'react';
+import { Redirect, Stack, usePathname } from 'expo-router';
+import { useEffect, useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { useAuth } from '@/contexts/auth-context';
 import { useLocale } from '@/contexts/locale-context';
 import { useAppTranslation } from '@/hooks/use-translation';
+import {
+  getPreferredLanguageFromUser,
+  hasCompletedLanguageOnboarding,
+} from '@/lib/language-onboarding';
 import { theme } from '@/lib/theme';
 
 export default function AppLayout() {
   const { t } = useAppTranslation();
-  const { language } = useLocale();
+  const { language, setLanguage } = useLocale();
   const { session, isLoading } = useAuth();
+  const pathname = usePathname();
+  const isOnboardingRoute = pathname.startsWith('/onboarding');
+  const languageOnboarded = session ? hasCompletedLanguageOnboarding(session.user) : false;
+  const preferredLanguage = session ? getPreferredLanguageFromUser(session.user) : null;
+
+  useEffect(() => {
+    if (languageOnboarded && preferredLanguage && preferredLanguage !== language) {
+      void setLanguage(preferredLanguage);
+    }
+  }, [language, languageOnboarded, preferredLanguage, setLanguage]);
 
   const screenTitles = useMemo(
     () => ({
@@ -44,8 +58,17 @@ export default function AppLayout() {
     return <Redirect href="/login" />;
   }
 
+  if (languageOnboarded && isOnboardingRoute) {
+    return <Redirect href="/(app)/(tabs)" />;
+  }
+
+  if (!languageOnboarded && !isOnboardingRoute) {
+    return <Redirect href="/onboarding/language" />;
+  }
+
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.colors.background } }}>
+      <Stack.Screen name="onboarding/language" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="transaction/new"

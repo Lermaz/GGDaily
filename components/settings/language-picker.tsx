@@ -2,25 +2,43 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useLocale } from '@/contexts/locale-context';
 import { useAppTranslation } from '@/hooks/use-translation';
+import type { AppLanguage } from '@/lib/i18n';
 import { theme } from '@/lib/theme';
 
-export function LanguagePicker() {
+interface LanguagePickerProps {
+  language?: AppLanguage;
+  onLanguageChange?: (language: AppLanguage) => void;
+  label?: string;
+}
+
+export function LanguagePicker(props: LanguagePickerProps = {}) {
+  const { language: controlledLanguage, onLanguageChange, label } = props;
   const { t } = useAppTranslation();
-  const { language, setLanguage } = useLocale();
+  const locale = useLocale();
+  const language = controlledLanguage ?? locale.language;
+
+  async function handleSelect(nextLanguage: AppLanguage) {
+    if (onLanguageChange) {
+      onLanguageChange(nextLanguage);
+      return;
+    }
+
+    await locale.setLanguage(nextLanguage);
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{t('language.label')}</Text>
+      <Text style={styles.label}>{label ?? t('language.label')}</Text>
       <View style={styles.row}>
         <LanguageButton
           label={t('language.english')}
           active={language === 'en'}
-          onPress={() => setLanguage('en')}
+          onPress={() => handleSelect('en')}
         />
         <LanguageButton
           label={t('language.spanish')}
           active={language === 'es'}
-          onPress={() => setLanguage('es')}
+          onPress={() => handleSelect('es')}
         />
       </View>
     </View>

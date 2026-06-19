@@ -67,7 +67,7 @@ export function TransactionForm({
     if (!categoryId && filteredCategories.length > 0) {
       setCategoryId(filteredCategories[0].id);
     }
-  }, [categoryId, filteredCategories]);
+  }, [categoryId, categories, kind]);
 
   function handleKindChange(nextKind: CategoryKind) {
     setKind(nextKind);

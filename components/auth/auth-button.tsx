@@ -19,7 +19,6 @@ export function AuthButton({
   variant = 'primary',
   isLoading = false,
   disabled,
-  style,
   ...props
 }: AuthButtonProps) {
   const isDisabled = disabled || isLoading;
@@ -33,9 +32,8 @@ export function AuthButton({
       style={({ pressed }) => [
         styles.base,
         variant === 'primary' ? styles.primary : styles.secondary,
-        isDisabled && styles.disabled,
-        pressed && !isDisabled && styles.pressed,
-        style,
+        isDisabled ? styles.disabled : null,
+        pressed && !isDisabled ? styles.pressed : null,
       ]}
       {...props}
     >

@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -17,8 +16,9 @@ import { ErrorBanner } from '@/components/auth/error-banner';
 import { AmountInput } from '@/components/finance/amount-input';
 import { CategoryPicker } from '@/components/finance/category-picker';
 import { useCategories } from '@/hooks/use-categories';
+import { useAppTranslation } from '@/hooks/use-translation';
 import { formatDisplayDate, parseDateString, toDateString } from '@/lib/finance/types';
-import { transactionFormSchema } from '@/lib/finance/validation';
+import { getTransactionFormSchema } from '@/lib/validation-i18n';
 import { theme } from '@/lib/theme';
 import type { CategoryKind } from '@/types/database';
 
@@ -46,6 +46,8 @@ export function TransactionForm({
   onSubmit,
   onDelete,
 }: TransactionFormProps) {
+  const { t } = useAppTranslation();
+  const transactionFormSchema = useMemo(() => getTransactionFormSchema(t), [t]);
   const { categories } = useCategories();
   const [kind, setKind] = useState<CategoryKind>(initialValues?.kind ?? 'expense');
   const [amount, setAmount] = useState(initialValues?.amount ?? '');
@@ -143,12 +145,20 @@ export function TransactionForm({
         <ErrorBanner message={error} />
 
         <View style={styles.kindToggle}>
-          <KindButton label="Expense" active={kind === 'expense'} onPress={() => handleKindChange('expense')} />
-          <KindButton label="Income" active={kind === 'income'} onPress={() => handleKindChange('income')} />
+          <KindButton
+            label={t('transactions.expense')}
+            active={kind === 'expense'}
+            onPress={() => handleKindChange('expense')}
+          />
+          <KindButton
+            label={t('transactions.income')}
+            active={kind === 'income'}
+            onPress={() => handleKindChange('income')}
+          />
         </View>
 
         <AmountInput
-          label="Amount"
+          label={t('transactions.amount')}
           value={amount}
           onChangeText={setAmount}
           error={fieldErrors.amount}
@@ -156,11 +166,11 @@ export function TransactionForm({
         />
 
         <AuthInput
-          label="Description"
+          label={t('transactions.description')}
           value={description}
           onChangeText={setDescription}
           error={fieldErrors.description}
-          placeholder="What was this for?"
+          placeholder={t('transactions.descriptionPlaceholder')}
           editable={!isLoading}
         />
 
@@ -172,7 +182,7 @@ export function TransactionForm({
         />
 
         <View style={styles.dateField}>
-          <Text style={styles.label}>Date</Text>
+          <Text style={styles.label}>{t('transactions.date')}</Text>
           <Pressable
             style={styles.dateButton}
             onPress={() => setShowDatePicker(true)}
@@ -198,7 +208,7 @@ export function TransactionForm({
 
         {onDelete ? (
           <AuthButton
-            label="Delete transaction"
+            label={t('transactions.delete')}
             variant="secondary"
             onPress={handleDelete}
             disabled={isLoading}

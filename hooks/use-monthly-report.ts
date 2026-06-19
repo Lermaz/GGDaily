@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import i18n from '@/lib/i18n';
+
 import { useTransactions } from '@/hooks/use-transactions';
 import type { TransactionWithCategory } from '@/types/database';
 
@@ -61,7 +63,7 @@ function buildExpensesByCategory(
 
   const top = sorted.slice(0, 5);
   const otherAmount = sorted.slice(5).reduce((sum, item) => sum + item.amount, 0);
-  return [...top, { name: 'Other', amount: otherAmount, color: '#64748B' }];
+  return [...top, { name: i18n.t('common.other'), amount: otherAmount, color: '#64748B' }];
 }
 
 function buildWeeklyTotals(transactions: TransactionWithCategory[]): WeeklyTotals[] {

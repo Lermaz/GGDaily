@@ -1,5 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { useAppTranslation } from '@/hooks/use-translation';
 import { theme } from '@/lib/theme';
 import type { Category } from '@/types/database';
 
@@ -11,9 +12,10 @@ interface CategoryPickerProps {
 }
 
 export function CategoryPicker({ categories, selectedId, onSelect, error }: CategoryPickerProps) {
+  const { t } = useAppTranslation();
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Category</Text>
+      <Text style={styles.label}>{t('transactions.category')}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.list}>
         {categories.map((category) => {
           const isSelected = category.id === selectedId;

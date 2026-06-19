@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,7 +14,7 @@ import { ErrorBanner } from '@/components/auth/error-banner';
 import { AmountInput } from '@/components/finance/amount-input';
 import { ColorPicker } from '@/components/finance/color-picker';
 import { useAppTranslation } from '@/hooks/use-translation';
-import { categoryFormSchema } from '@/lib/finance/validation';
+import { getCategoryFormSchema } from '@/lib/validation-i18n';
 import { theme } from '@/lib/theme';
 import type { CategoryKind } from '@/types/database';
 
@@ -44,6 +44,7 @@ export function CategoryForm({
   onDelete,
 }: CategoryFormProps) {
   const { t } = useAppTranslation();
+  const categoryFormSchema = useMemo(() => getCategoryFormSchema(t), [t]);
   const [name, setName] = useState(initialValues.name);
   const [kind] = useState(initialValues.kind);
   const [color, setColor] = useState(initialValues.color);
@@ -100,7 +101,7 @@ export function CategoryForm({
     const { error: deleteError } = await onDelete();
     setIsLoading(false);
     if (deleteError) {
-      setError(deleteError);
+      setError(deleteError === 'category_in_use' ? t('categories.deleteBlocked') : deleteError);
     }
   }
 

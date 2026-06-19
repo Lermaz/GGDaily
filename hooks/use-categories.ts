@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '@/contexts/auth-context';
+import i18n from '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
 import type { Category, CategoryKind } from '@/types/database';
 
@@ -99,7 +100,7 @@ export function useCategories(): UseCategoriesResult {
       monthlyLimit?: number | null;
     }) => {
       if (!session?.user.id) {
-        return { error: 'Not authenticated' };
+        return { error: i18n.t('common.notAuthenticated') };
       }
 
       const { error: insertError } = await supabase.from('categories').insert({
@@ -147,7 +148,7 @@ export function useCategories(): UseCategoriesResult {
 
       if (deleteError) {
         if (deleteError.code === '23503') {
-          return { error: 'Cannot delete a category that has transactions.' };
+          return { error: 'category_in_use' };
         }
         return { error: deleteError.message };
       }

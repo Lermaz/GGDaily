@@ -2,9 +2,11 @@ import { Redirect, Stack } from 'expo-router';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { useAuth } from '@/contexts/auth-context';
+import { useAppTranslation } from '@/hooks/use-translation';
 import { theme } from '@/lib/theme';
 
 export default function AppLayout() {
+  const { t } = useAppTranslation();
   const { session, isLoading } = useAuth();
 
   if (isLoading) {
@@ -24,19 +26,19 @@ export default function AppLayout() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="transaction/new"
-        options={{ presentation: 'modal', headerShown: true, title: 'Add transaction' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('transactions.add') }}
       />
       <Stack.Screen
         name="transaction/[id]"
-        options={{ presentation: 'modal', headerShown: true, title: 'Edit transaction' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('transactions.edit') }}
       />
       <Stack.Screen
         name="category/new"
-        options={{ presentation: 'modal', headerShown: true, title: 'Add category' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('categories.add') }}
       />
       <Stack.Screen
         name="category/[id]"
-        options={{ presentation: 'modal', headerShown: true, title: 'Edit category' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('categories.edit') }}
       />
     </Stack>
   );

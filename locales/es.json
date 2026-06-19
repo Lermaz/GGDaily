@@ -7,7 +7,8 @@
     "back": "Atrás",
     "loading": "Cargando...",
     "error": "Algo salió mal",
-    "other": "Otros"
+    "other": "Otros",
+    "notAuthenticated": "No autenticado"
   },
   "language": {
     "label": "Idioma",
@@ -79,7 +80,8 @@
     "category": "Categoría",
     "expense": "Gasto",
     "income": "Ingreso",
-    "descriptionPlaceholder": "¿Para qué fue?"
+    "descriptionPlaceholder": "¿Para qué fue?",
+    "untitled": "Transacción"
   },
   "categories": {
     "title": "Categorías",

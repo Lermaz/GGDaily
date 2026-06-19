@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '@/contexts/auth-context';
 import type { TransactionFilters } from '@/lib/finance/filters';
+import i18n from '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
 import type { TransactionWithCategory } from '@/types/database';
 
@@ -111,7 +112,7 @@ export function useTransactions(filters?: TransactionFilters): UseTransactionsRe
       occurredOn: string;
     }) => {
       if (!session?.user.id) {
-        return { error: 'Not authenticated' };
+        return { error: i18n.t('common.notAuthenticated') };
       }
 
       const { error: insertError } = await supabase.from('transactions').insert({

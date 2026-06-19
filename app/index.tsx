@@ -4,9 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AuthButton } from '@/components/auth/auth-button';
 import { useAuth } from '@/contexts/auth-context';
+import { useAppTranslation } from '@/hooks/use-translation';
 import { theme } from '@/lib/theme';
 
 export default function HomeScreen() {
+  const { t } = useAppTranslation();
   const { session, isLoading } = useAuth();
 
   if (!isLoading && session) {
@@ -18,17 +20,15 @@ export default function HomeScreen() {
       <View style={styles.container}>
         <View style={styles.hero}>
           <Text style={styles.title} accessibilityRole="header">
-            GGDaily
+            {t('common.appName')}
           </Text>
-          <Text style={styles.subtitle}>
-            Track your income, expenses, and balance in one place.
-          </Text>
+          <Text style={styles.subtitle}>{t('auth.homeSubtitle')}</Text>
         </View>
 
         <View style={styles.actions}>
-          <AuthButton label="Log in" onPress={() => router.push('/login')} />
+          <AuthButton label={t('auth.logIn')} onPress={() => router.push('/login')} />
           <AuthButton
-            label="Create account"
+            label={t('auth.createAccount')}
             variant="secondary"
             onPress={() => router.push('/register')}
           />

@@ -5,39 +5,6 @@ import i18n from '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
 import type { Category, CategoryKind } from '@/types/database';
 
-const DEFAULT_CATEGORIES: Array<{ name: string; kind: CategoryKind; color: string }> = [
-  { name: 'Salary', kind: 'income', color: '#16A34A' },
-  { name: 'Freelance', kind: 'income', color: '#22C55E' },
-  { name: 'Other Income', kind: 'income', color: '#4ADE80' },
-  { name: 'Food', kind: 'expense', color: '#EF4444' },
-  { name: 'Rent', kind: 'expense', color: '#DC2626' },
-  { name: 'Transport', kind: 'expense', color: '#F97316' },
-  { name: 'Bills', kind: 'expense', color: '#EAB308' },
-  { name: 'Shopping', kind: 'expense', color: '#8B5CF6' },
-  { name: 'Entertainment', kind: 'expense', color: '#EC4899' },
-  { name: 'Other', kind: 'expense', color: '#64748B' },
-];
-
-async function seedDefaultCategoriesIfNeeded(userId: string) {
-  const { count, error: countError } = await supabase
-    .from('categories')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId);
-
-  if (countError || (count ?? 0) > 0) {
-    return;
-  }
-
-  await supabase.from('categories').insert(
-    DEFAULT_CATEGORIES.map((category) => ({
-      user_id: userId,
-      name: category.name,
-      kind: category.kind,
-      color: category.color,
-    })),
-  );
-}
-
 interface UseCategoriesResult {
   categories: Category[];
   isLoading: boolean;
@@ -70,7 +37,6 @@ export function useCategories(): UseCategoriesResult {
     }
 
     setIsLoading(true);
-    await seedDefaultCategoriesIfNeeded(session.user.id);
 
     const { data, error: fetchError } = await supabase
       .from('categories')

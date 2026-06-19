@@ -3,13 +3,11 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BudgetAlertBanner } from '@/components/finance/budget-alert-banner';
-import { LanguagePicker } from '@/components/settings/language-picker';
 import { AuthButton } from '@/components/auth/auth-button';
 import { EmptyState } from '@/components/finance/empty-state';
 import { ScreenHeader } from '@/components/finance/screen-header';
 import { SummaryCard } from '@/components/finance/summary-card';
 import { TransactionRow } from '@/components/finance/transaction-row';
-import { useAuth } from '@/contexts/auth-context';
 import { useCategoryBudgets } from '@/hooks/use-category-budgets';
 import { useDashboardSummary } from '@/hooks/use-dashboard-summary';
 import { useAppTranslation } from '@/hooks/use-translation';
@@ -18,15 +16,9 @@ import { theme } from '@/lib/theme';
 
 export default function DashboardScreen() {
   const { t } = useAppTranslation();
-  const { signOut } = useAuth();
   const { balance, monthlyIncome, monthlyExpenses, recentTransactions, isLoading, error } =
     useDashboardSummary();
   const { alerts } = useCategoryBudgets();
-
-  async function handleSignOut() {
-    await signOut();
-    router.replace('/');
-  }
 
   if (isLoading) {
     return (
@@ -40,10 +32,12 @@ export default function DashboardScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScreenHeader
         title={t('dashboard.title')}
-        rightAction={{ label: t('auth.signOut'), onPress: handleSignOut }}
+        rightIconAction={{
+          accessibilityLabel: t('settings.openSettings'),
+          onPress: () => router.push('/settings'),
+        }}
       />
       <ScrollView contentContainerStyle={styles.content}>
-        <LanguagePicker />
         <BudgetAlertBanner alerts={alerts} />
         {error ? <Text style={styles.error}>{error}</Text> : null}
 

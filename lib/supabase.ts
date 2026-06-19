@@ -13,15 +13,23 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+const isWebBrowser = Platform.OS === 'web' && typeof window !== 'undefined';
+
 const SecureStoreAdapter = {
   getItem: (key: string) => {
     if (Platform.OS === 'web') {
+      if (!isWebBrowser) {
+        return Promise.resolve(null);
+      }
       return Promise.resolve(localStorage.getItem(key));
     }
     return SecureStore.getItemAsync(key);
   },
   setItem: (key: string, value: string) => {
     if (Platform.OS === 'web') {
+      if (!isWebBrowser) {
+        return Promise.resolve();
+      }
       localStorage.setItem(key, value);
       return Promise.resolve();
     }
@@ -29,6 +37,9 @@ const SecureStoreAdapter = {
   },
   removeItem: (key: string) => {
     if (Platform.OS === 'web') {
+      if (!isWebBrowser) {
+        return Promise.resolve();
+      }
       localStorage.removeItem(key);
       return Promise.resolve();
     }

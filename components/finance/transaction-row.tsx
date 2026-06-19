@@ -14,12 +14,20 @@ export function TransactionRow({ transaction, onPress }: TransactionRowProps) {
   const { t } = useAppTranslation();
   const kind = (transaction.category?.kind ?? 'expense') as CategoryKind;
   const amountColor = kind === 'income' ? theme.colors.income : theme.colors.expense;
+  const categoryName = transaction.category?.name;
+  const description = transaction.description?.trim();
+  const displayDescription = description || (!categoryName ? t('transactions.untitled') : null);
 
   return (
     <Pressable
       onPress={onPress}
       disabled={!onPress}
       accessibilityRole="button"
+      accessibilityLabel={
+        [categoryName, displayDescription, formatDisplayDate(transaction.occurred_on), formatSignedAmount(transaction.amount, kind)]
+          .filter(Boolean)
+          .join(', ')
+      }
       style={({ pressed }) => [styles.row, pressed && onPress && styles.pressed]}
     >
       <View style={styles.left}>
@@ -27,13 +35,20 @@ export function TransactionRow({ transaction, onPress }: TransactionRowProps) {
           <View
             style={[styles.dot, { backgroundColor: transaction.category?.color ?? theme.colors.border }]}
           />
-          <Text style={styles.description} numberOfLines={1}>
-            {transaction.description || transaction.category?.name || t('transactions.untitled')}
-          </Text>
+          <View style={styles.textColumn}>
+            {categoryName ? (
+              <Text style={styles.categoryName} numberOfLines={1}>
+                {categoryName}
+              </Text>
+            ) : null}
+            {displayDescription ? (
+              <Text style={[styles.description, categoryName && styles.descriptionSecondary]} numberOfLines={2}>
+                {displayDescription}
+              </Text>
+            ) : null}
+            <Text style={styles.meta}>{formatDisplayDate(transaction.occurred_on)}</Text>
+          </View>
         </View>
-        <Text style={styles.meta}>
-          {transaction.category?.name} · {formatDisplayDate(transaction.occurred_on)}
-        </Text>
       </View>
       <Text style={[styles.amount, { color: amountColor }]}>
         {formatSignedAmount(transaction.amount, kind)}
@@ -59,23 +74,36 @@ const styles = StyleSheet.create({
   },
   left: {
     flex: 1,
-    gap: theme.spacing.xs,
   },
   titleRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: theme.spacing.sm,
+  },
+  textColumn: {
+    flex: 1,
+    gap: 2,
   },
   dot: {
     width: 10,
     height: 10,
     borderRadius: 5,
+    marginTop: 5,
+  },
+  categoryName: {
+    fontSize: theme.typography.body,
+    fontWeight: '700',
+    color: theme.colors.text,
   },
   description: {
-    flex: 1,
     fontSize: theme.typography.body,
     fontWeight: '600',
     color: theme.colors.text,
+  },
+  descriptionSecondary: {
+    fontSize: theme.typography.caption,
+    fontWeight: '500',
+    color: theme.colors.textSecondary,
   },
   meta: {
     fontSize: theme.typography.caption,

@@ -18,21 +18,12 @@ export function ExpensePieChart({ data, title }: ExpensePieChartProps) {
   const pieData = data.map((item) => ({
     value: item.amount,
     color: item.color,
-    text: item.name,
   }));
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      <PieChart
-        data={pieData}
-        donut
-        radius={90}
-        innerRadius={50}
-        showText
-        textColor={theme.colors.text}
-        textSize={11}
-      />
+      <PieChart data={pieData} donut radius={90} innerRadius={50} />
       <View style={styles.legend}>
         {data.map((item) => (
           <View key={item.name} style={styles.legendRow}>

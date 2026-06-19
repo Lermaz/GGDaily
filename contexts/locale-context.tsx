@@ -1,12 +1,12 @@
-import * as SecureStore from 'expo-secure-store';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import i18n, {
   AppLanguage,
-  getDeviceLanguage,
+  DEFAULT_LANGUAGE,
   isAppLanguage,
   LOCALE_STORAGE_KEY,
 } from '@/lib/i18n';
+import { getLocaleStorageItem, setLocaleStorageItem } from '@/lib/locale-storage';
 
 interface LocaleContextValue {
   language: AppLanguage;
@@ -17,13 +17,13 @@ interface LocaleContextValue {
 const LocaleContext = createContext<LocaleContextValue | undefined>(undefined);
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<AppLanguage>(getDeviceLanguage());
+  const [language, setLanguageState] = useState<AppLanguage>(DEFAULT_LANGUAGE);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     async function loadLanguage() {
-      const stored = await SecureStore.getItemAsync(LOCALE_STORAGE_KEY);
-      const nextLanguage = stored && isAppLanguage(stored) ? stored : getDeviceLanguage();
+      const stored = await getLocaleStorageItem(LOCALE_STORAGE_KEY);
+      const nextLanguage = stored && isAppLanguage(stored) ? stored : DEFAULT_LANGUAGE;
       await i18n.changeLanguage(nextLanguage);
       setLanguageState(nextLanguage);
       setIsReady(true);
@@ -34,7 +34,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 
   const setLanguage = useCallback(async (nextLanguage: AppLanguage) => {
     await i18n.changeLanguage(nextLanguage);
-    await SecureStore.setItemAsync(LOCALE_STORAGE_KEY, nextLanguage);
+    await setLocaleStorageItem(LOCALE_STORAGE_KEY, nextLanguage);
     setLanguageState(nextLanguage);
   }, []);
 
